@@ -38,11 +38,14 @@ class JsonPath
               @obj = node
               array_args = sub_path.gsub('@','@obj').split(':')
               start_idx = process_function_or_literal(array_args[0], 0)
+              # Start index must exist
               next unless start_idx
+              next if start_idx.abs >= node.size
               start_idx %= node.size
+              # Allow End index range to go beyond the array length
               end_idx = (array_args[1] && process_function_or_literal(array_args[1], -1) || (sub_path.count(':') == 0 ? start_idx : -1))
               next unless end_idx
-              end_idx %= node.size
+              end_idx = [[end_idx, -(node.size+1)].max, (node.size-1)].min % node.size
               step = process_function_or_literal(array_args[2], 1)
               next unless step
               (start_idx..end_idx).step(step) {|i| each(node, i, pos + 1, &blk)}

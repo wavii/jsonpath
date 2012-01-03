@@ -36,6 +36,15 @@ class TestJsonpath < MiniTest::Unit::TestCase
     assert_equal [@object['store']['book'][2], @object['store']['book'][3]], JsonPath.new('$..book[2::]').on(@object)
   end
 
+  def test_empty_array_splices
+    assert_equal [], JsonPath.new('$..book[4]').on(@object)
+    assert_equal [], JsonPath.new('$..book[-4]').on(@object)
+    assert_equal 4, JsonPath.new('$..book[0:100]').on(@object).length
+    assert_equal 2, JsonPath.new('$..book[0:100:2]').on(@object).length
+    assert_equal 4, JsonPath.new('$..book[0:-100]').on(@object).length
+    assert_equal 2, JsonPath.new('$..book[0:-100:2]').on(@object).length
+  end
+
   def test_recognize_array_comma
     assert_equal [@object['store']['book'][0], @object['store']['book'][1]], JsonPath.new('$..book[0,1]').on(@object)
     assert_equal [@object['store']['book'][2], @object['store']['book'][3]], JsonPath.new('$..book[2,-1::]').on(@object)
